@@ -1,0 +1,345 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>12306(一) | Dalowed</title><meta name="author" content="Dalowed"><meta name="copyright" content="Dalowed"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="本项目为开源项目 包先了解相关包，对项目有个整体的了解。 配置相关看 官方环境搭建 就行了 站点查询相关因为 查询大多都类似 ，比较复杂的就是首页进行车票查询，所以再这里只写一个 接口 &#x2F;api&#x2F;ticket-service&#x2F;ticket&#x2F;query ，查询车票(默认访问查询 北京到杭州的车票 )访问首页即可触发 大致流程: 请求首先会在网关中被拦截，然后通过黑白名单进行过滤，请求再到相应服务端进">
+<meta property="og:type" content="article">
+<meta property="og:title" content="12306(一)">
+<meta property="og:url" content="https://dalowed.github.io/posts/12306/12306(%E4%B8%80)/index.html">
+<meta property="og:site_name" content="Dalowed">
+<meta property="og:description" content="本项目为开源项目 包先了解相关包，对项目有个整体的了解。 配置相关看 官方环境搭建 就行了 站点查询相关因为 查询大多都类似 ，比较复杂的就是首页进行车票查询，所以再这里只写一个 接口 &#x2F;api&#x2F;ticket-service&#x2F;ticket&#x2F;query ，查询车票(默认访问查询 北京到杭州的车票 )访问首页即可触发 大致流程: 请求首先会在网关中被拦截，然后通过黑白名单进行过滤，请求再到相应服务端进">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://dalowed.github.io/img/12306/12306.png">
+<meta property="article:published_time" content="2024-10-18T06:25:00.000Z">
+<meta property="article:modified_time" content="2024-10-18T11:21:58.704Z">
+<meta property="article:author" content="Dalowed">
+<meta property="article:tag" content="12306">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dalowed.github.io/img/12306/12306.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dalowed.github.io/posts/12306/12306(%E4%B8%80)/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        if (name && globalFn[key][name]) return
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+          
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?1975b0c249d8079d1404431af679d0aa";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+btf.addGlobalFn('pjaxComplete', () => {
+  _hmt.push(['_trackPageview',window.location.pathname])
+}, 'baidu_analytics')
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":true,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"已经过了","messageNext":"天自上次更新，文章内容可能已过时。"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":230,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":100,"languages":{"author":"作者: Dalowed","link":"链接: ","source":"来源: Dalowed","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-left"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: true,
+  percent: {
+    toc: false,
+    rightside: false,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '12306(一)',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-10-18 19:21:58'
+}</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://unpkg.zhimg.com/hexo-butterfly-footer-beautify@1.0.0/lib/runtime.min.css" media="print" onload="this.media='all'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load', preloader.endLoading)
+
+  if (true) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="web_bg" style="background-image: url(/img/background.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">1</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-compass"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-calendar"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/12306/12306.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Dalowed</span></a><a class="nav-page-title" href="/"><span class="site-name">12306(一)</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-compass"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-calendar"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">12306(一)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-10-18T06:25:00.000Z" title="发表于 2024-10-18 14:25:00">2024-10-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-10-18T11:21:58.704Z" title="更新于 2024-10-18 19:21:58">2024-10-18</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>本项目为<a target="_blank" rel="noopener" href="https://github.com/Wangbangc/12306">开源项目</a></p>
+<h1 id="包"><a href="#包" class="headerlink" title="包"></a>包</h1><p>先了解相关包，对项目有个整体的了解。<br><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/12306/package.png" alt="包相关说明" /></p>
+<p>配置相关看 <a target="_blank" rel="noopener" href="https://nageoffer.com/12306/environment-configuration/">官方环境搭建</a> 就行了</p>
+<h1 id="站点查询相关"><a href="#站点查询相关" class="headerlink" title="站点查询相关"></a>站点查询相关</h1><p>因为 <code>查询大多都类似</code> ，比较复杂的就是首页进行车票查询，所以再这里只写一个</p>
+<p>接口 <code>/api/ticket-service/ticket/query</code> ，查询车票(默认访问查询 <code>北京到杭州的车票</code> )访问首页即可触发</p>
+<p>大致流程: 请求首先会在网关中被拦截，然后通过黑白名单进行过滤，请求再到相应服务端进行处理，对于上述车票的查询，<code>网关路由到服务端后首先查询缓存，查询不到就查询数据库，并将相关数据存储在缓存中</code>。</p>
+<p>具体流程如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//服务端接口</span></span><br><span class="line"><span class="meta">@GetMapping(&quot;/api/ticket-service/ticket/query&quot;)</span></span><br><span class="line"><span class="keyword">public</span> Result&lt;TicketPageQueryRespDTO&gt; pageListTicketQuery</span><br><span class="line"><span class="comment">// 参数为 两站台缩写</span></span><br><span class="line">(TicketPageQueryReqDTO requestParam) &#123;</span><br><span class="line">    <span class="keyword">return</span> Results.success(</span><br><span class="line">        ticketService.pageListTicketQueryV1(requestParam));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>进入到实现层后，第一行代码就是利用 <code>责任链模式</code>，首先 <code>对参数进行校验</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 责任链模式 验证城市名称是否存在、不存在加载缓存以及出发日期不能小于当前日期等等</span></span><br><span class="line">ticketPageQueryAbstractChainContext.handler</span><br><span class="line"><span class="comment">// 第一个参数是标记，用于区分不同的责任链</span></span><br><span class="line"><span class="comment">// 第二个是要进行校验的参数</span></span><br><span class="line">(TicketChainMarkEnum.TRAIN_QUERY_FILTER.name(), requestParam);</span><br></pre></td></tr></table></figure>
+<p>再进入到 <code>ticketPageQueryAbstractChainContext</code> 时，首先我们要看一个接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">CommandLineRunner</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">run</span><span class="params">(String... args)</span> <span class="keyword">throws</span> Exception;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这是一个单接口， <code>文中用了大量的 @FunctionalInterface 来标识接口，我能想到的目的就是规范开发， 只定义一个接口增加灵活性，方便扩展 ? </code></p>
+<p>接下来再进入 <code>ticketPageQueryAbstractChainContext</code> 查看</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">AbstractChainContext</span>&lt;T&gt; <span class="keyword">implements</span> <span class="title class_">CommandLineRunner</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, List&lt;AbstractChainHandler&gt;&gt; abstractChainHandlerContainer </span><br><span class="line">    = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 责任链组件执行</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> mark         责任链组件标识</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> requestParam 请求参数</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handler</span><span class="params">(String mark, T requestParam)</span> &#123;</span><br><span class="line">        List&lt;AbstractChainHandler&gt; abstractChainHandlers </span><br><span class="line">        = abstractChainHandlerContainer.get(mark);</span><br><span class="line">        <span class="keyword">if</span> (CollectionUtils.isEmpty(abstractChainHandlers)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(String</span><br><span class="line">            .format(<span class="string">&quot;[%s] Chain of Responsibility ID is undefined.&quot;</span>, mark));</span><br><span class="line">        &#125;</span><br><span class="line">        abstractChainHandlers.</span><br><span class="line">        forEach(each -&gt; each.handler(requestParam));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在初始化时就进行装载， 我给忘了在哪里加载来着。chao TODO</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">(String... args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        Map&lt;String, AbstractChainHandler&gt; chainFilterMap = ApplicationContextHolder</span><br><span class="line">                .getBeansOfType(AbstractChainHandler.class);</span><br><span class="line">        chainFilterMap.forEach((beanName, bean) -&gt; &#123;</span><br><span class="line">            List&lt;AbstractChainHandler&gt; abstractChainHandlers = </span><br><span class="line">            abstractChainHandlerContainer.get(bean.mark());</span><br><span class="line">            <span class="keyword">if</span> (CollectionUtils.isEmpty(abstractChainHandlers)) &#123;</span><br><span class="line">                abstractChainHandlers = <span class="keyword">new</span> <span class="title class_">ArrayList</span>();</span><br><span class="line">            &#125;</span><br><span class="line">            abstractChainHandlers.add(bean);</span><br><span class="line">            List&lt;AbstractChainHandler&gt; actualAbstractChainHandlers = </span><br><span class="line">            abstractChainHandlers.stream()</span><br><span class="line">                    .sorted(Comparator.comparing(Ordered::getOrder))</span><br><span class="line">                    .collect(Collectors.toList());</span><br><span class="line">            abstractChainHandlerContainer.put(bean.mark(), actualAbstractChainHandlers);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>上述最重要的是 <code>abstractChainHandlers.forEach(each -&gt; each.handler(requestParam));</code><br>将参数依次传到责任链进行相关校验</p>
+<p><code>之后基本上都是查询数据库写入缓存的操作，我只写逻辑，没怎么给注释</code> </p>
+<p><code>感觉代码很美</code>，可以多看看写法，很帅</p>
+<p>校验完成后尝试从 Redis 缓存中进行获取两地信息，如果获取不到就加锁用 <code>双重校验锁(锁前查询一次，锁后再查询一次)</code> 进行 数据库获取 <code>所有站台缩写与城市之间的映射关系</code> 查询并插入 缓存</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Object&gt; stationDetails = stringRedisTemplate.opsForHash()</span><br><span class="line">        .multiGet(REGION_TRAIN_STATION_MAPPING,</span><br><span class="line">                Lists.newArrayList(requestParam.getFromStation(), requestParam.getToStation()));</span><br><span class="line"><span class="type">long</span> <span class="variable">count</span> <span class="operator">=</span> stationDetails.stream().filter(Objects::isNull).count();</span><br><span class="line"><span class="keyword">if</span> (count &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="type">RLock</span> <span class="variable">lock</span> <span class="operator">=</span> redissonClient.getLock(LOCK_REGION_TRAIN_STATION_MAPPING);</span><br><span class="line">    lock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        stationDetails = stringRedisTemplate.opsForHash()</span><br><span class="line">                .multiGet(REGION_TRAIN_STATION_MAPPING, Lists.newArrayList(requestParam.getFromStation(), requestParam.getToStation()));</span><br><span class="line">        count = stationDetails.stream().filter(Objects::isNull).count();</span><br><span class="line">        <span class="keyword">if</span> (count &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            List&lt;StationDO&gt; stationDOList = stationMapper.selectList(Wrappers.emptyWrapper());</span><br><span class="line">            Map&lt;String, String&gt; regionTrainStationMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">            stationDOList.forEach(each -&gt; regionTrainStationMap.put(each.getCode(), each.getRegionName()));</span><br><span class="line">            stringRedisTemplate.opsForHash().putAll(REGION_TRAIN_STATION_MAPPING, regionTrainStationMap);</span><br><span class="line">            stationDetails = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">            stationDetails.add(regionTrainStationMap.get(requestParam.getFromStation()));</span><br><span class="line">            stationDetails.add(regionTrainStationMap.get(requestParam.getToStation()));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>获取到数据后，再通过同样的方式，获取到 <code>所有北京到杭州站点的车票</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">List&lt;TicketListDTO&gt; seatResults = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"><span class="type">String</span> <span class="variable">buildRegionTrainStationHashKey</span> <span class="operator">=</span> String.format(REGION_TRAIN_STATION, stationDetails.get(<span class="number">0</span>), stationDetails.get(<span class="number">1</span>));</span><br><span class="line">Map&lt;Object, Object&gt; regionTrainStationAllMap = stringRedisTemplate.opsForHash().entries(buildRegionTrainStationHashKey);</span><br><span class="line"><span class="keyword">if</span> (MapUtil.isEmpty(regionTrainStationAllMap)) &#123;</span><br><span class="line">    <span class="type">RLock</span> <span class="variable">lock</span> <span class="operator">=</span> redissonClient.getLock(LOCK_REGION_TRAIN_STATION);</span><br><span class="line">    lock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        regionTrainStationAllMap = stringRedisTemplate.opsForHash().entries(buildRegionTrainStationHashKey);</span><br><span class="line">        <span class="keyword">if</span> (MapUtil.isEmpty(regionTrainStationAllMap)) &#123;</span><br><span class="line">            LambdaQueryWrapper&lt;TrainStationRelationDO&gt; queryWrapper = Wrappers.lambdaQuery(TrainStationRelationDO.class)</span><br><span class="line">                    .eq(TrainStationRelationDO::getStartRegion, stationDetails.get(<span class="number">0</span>))</span><br><span class="line">                    .eq(TrainStationRelationDO::getEndRegion, stationDetails.get(<span class="number">1</span>));</span><br><span class="line">            List&lt;TrainStationRelationDO&gt; trainStationRelationList = trainStationRelationMapper.selectList(queryWrapper);</span><br><span class="line">            <span class="keyword">for</span> (TrainStationRelationDO each : trainStationRelationList) &#123;</span><br><span class="line">                <span class="type">TrainDO</span> <span class="variable">trainDO</span> <span class="operator">=</span> distributedCache.safeGet(</span><br><span class="line">                        TRAIN_INFO + each.getTrainId(),</span><br><span class="line">                        TrainDO.class,</span><br><span class="line">                        () -&gt; trainMapper.selectById(each.getTrainId()),</span><br><span class="line">                        ADVANCE_TICKET_DAY,</span><br><span class="line">                        TimeUnit.DAYS);</span><br><span class="line">                <span class="type">TicketListDTO</span> <span class="variable">result</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TicketListDTO</span>();</span><br><span class="line">                result.setTrainId(String.valueOf(trainDO.getId()));</span><br><span class="line">                result.setTrainNumber(trainDO.getTrainNumber());</span><br><span class="line">                result.setDepartureTime(convertDateToLocalTime(each.getDepartureTime(), <span class="string">&quot;HH:mm&quot;</span>));</span><br><span class="line">                result.setArrivalTime(convertDateToLocalTime(each.getArrivalTime(), <span class="string">&quot;HH:mm&quot;</span>));</span><br><span class="line">                result.setDuration(DateUtil.calculateHourDifference(each.getDepartureTime(), each.getArrivalTime()));</span><br><span class="line">                result.setDeparture(each.getDeparture());</span><br><span class="line">                result.setArrival(each.getArrival());</span><br><span class="line">                result.setDepartureFlag(each.getDepartureFlag());</span><br><span class="line">                result.setArrivalFlag(each.getArrivalFlag());</span><br><span class="line">                result.setTrainType(trainDO.getTrainType());</span><br><span class="line">                result.setTrainBrand(trainDO.getTrainBrand());</span><br><span class="line">                <span class="keyword">if</span> (StrUtil.isNotBlank(trainDO.getTrainTag())) &#123;</span><br><span class="line">                    result.setTrainTags(StrUtil.split(trainDO.getTrainTag(), <span class="string">&quot;,&quot;</span>));</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="type">long</span> <span class="variable">betweenDay</span> <span class="operator">=</span> cn.hutool.core.date.DateUtil.betweenDay(each.getDepartureTime(), each.getArrivalTime(), <span class="literal">false</span>);</span><br><span class="line">                result.setDaysArrived((<span class="type">int</span>) betweenDay);</span><br><span class="line">                result.setSaleStatus(<span class="keyword">new</span> <span class="title class_">Date</span>().after(trainDO.getSaleTime()) ? <span class="number">0</span> : <span class="number">1</span>);</span><br><span class="line">                result.setSaleTime(convertDateToLocalTime(trainDO.getSaleTime(), <span class="string">&quot;MM-dd HH:mm&quot;</span>));</span><br><span class="line">                seatResults.add(result);</span><br><span class="line">                regionTrainStationAllMap.put(CacheUtil.buildKey(String.valueOf(each.getTrainId()), each.getDeparture(), each.getArrival()), JSON.toJSONString(result));</span><br><span class="line">            &#125;</span><br><span class="line">            stringRedisTemplate.opsForHash().putAll(buildRegionTrainStationHashKey, regionTrainStationAllMap);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再获取到 <code>车票余额、车座次相对应的价格</code> 并进行缓存</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">seatResults = CollUtil.isEmpty(seatResults)</span><br><span class="line">                ? regionTrainStationAllMap.values().stream().map(each -&gt; JSON.parseObject(each.toString(), TicketListDTO.class)).toList()</span><br><span class="line">                : seatResults;</span><br><span class="line">        seatResults = seatResults.stream().sorted(<span class="keyword">new</span> <span class="title class_">TimeStringComparator</span>()).toList();</span><br><span class="line">        <span class="keyword">for</span> (TicketListDTO each : seatResults) &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">trainStationPriceStr</span> <span class="operator">=</span> distributedCache.safeGet(</span><br><span class="line">                    String.format(TRAIN_STATION_PRICE, each.getTrainId(), each.getDeparture(), each.getArrival()),</span><br><span class="line">                    String.class,</span><br><span class="line">                    () -&gt; &#123;</span><br><span class="line">                        LambdaQueryWrapper&lt;TrainStationPriceDO&gt; trainStationPriceQueryWrapper = Wrappers.lambdaQuery(TrainStationPriceDO.class)</span><br><span class="line">                                .eq(TrainStationPriceDO::getDeparture, each.getDeparture())</span><br><span class="line">                                .eq(TrainStationPriceDO::getArrival, each.getArrival())</span><br><span class="line">                                .eq(TrainStationPriceDO::getTrainId, each.getTrainId());</span><br><span class="line">                        <span class="keyword">return</span> JSON.toJSONString(trainStationPriceMapper.selectList(trainStationPriceQueryWrapper));</span><br><span class="line">                    &#125;,</span><br><span class="line">                    ADVANCE_TICKET_DAY,</span><br><span class="line">                    TimeUnit.DAYS</span><br><span class="line">            );</span><br><span class="line">            List&lt;TrainStationPriceDO&gt; trainStationPriceDOList = JSON.parseArray(trainStationPriceStr, TrainStationPriceDO.class);</span><br><span class="line">            List&lt;SeatClassDTO&gt; seatClassList = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">            trainStationPriceDOList.forEach(item -&gt; &#123;</span><br><span class="line">                <span class="type">String</span> <span class="variable">seatType</span> <span class="operator">=</span> String.valueOf(item.getSeatType());</span><br><span class="line">                <span class="type">String</span> <span class="variable">keySuffix</span> <span class="operator">=</span> StrUtil.join(<span class="string">&quot;_&quot;</span>, each.getTrainId(), item.getDeparture(), item.getArrival());</span><br><span class="line">                <span class="type">Object</span> <span class="variable">quantityObj</span> <span class="operator">=</span> stringRedisTemplate.opsForHash().get(TRAIN_STATION_REMAINING_TICKET + keySuffix, seatType);</span><br><span class="line">                <span class="type">int</span> <span class="variable">quantity</span> <span class="operator">=</span> Optional.ofNullable(quantityObj)</span><br><span class="line">                        .map(Object::toString)</span><br><span class="line">                        .map(Integer::parseInt)</span><br><span class="line">                        .orElseGet(() -&gt; &#123;</span><br><span class="line">                            Map&lt;String, String&gt; seatMarginMap = seatMarginCacheLoader.load(String.valueOf(each.getTrainId()), seatType, item.getDeparture(), item.getArrival());</span><br><span class="line">                            <span class="keyword">return</span> Optional.ofNullable(seatMarginMap.get(String.valueOf(item.getSeatType()))).map(Integer::parseInt).orElse(<span class="number">0</span>);</span><br><span class="line">                        &#125;);</span><br><span class="line">                seatClassList.add(<span class="keyword">new</span> <span class="title class_">SeatClassDTO</span>(item.getSeatType(), quantity, <span class="keyword">new</span> <span class="title class_">BigDecimal</span>(item.getPrice()).divide(<span class="keyword">new</span> <span class="title class_">BigDecimal</span>(<span class="string">&quot;100&quot;</span>), <span class="number">1</span>, RoundingMode.HALF_UP), <span class="literal">false</span>));</span><br><span class="line">            &#125;);</span><br><span class="line">            each.setSeatClassList(seatClassList);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<p>到这里，基本上就结束了，中间三个代码段都是 对车票部分进行查询、缓存，还有一部分不好的地方，我找个时间补上。</p>
+<h1 id="总结一下"><a href="#总结一下" class="headerlink" title="总结一下"></a>总结一下</h1><p>这个项目查询车票流程基本这样，对于 <code>网关</code> 实现方式多，本项目是通过继承 <code>AbstractGatewayFilterFactory</code> ，主要重写 <code>apply</code> 方法实现。</p>
+<p>有很多代码写得很美，<br>像一开始的责任链模式进行参数校验，责任链实现在包<code>frameworks.designpattern</code>(前几太看的时候我还记得是如何加载的，现在我已经忘了T_T)<br>然后就是用 <code>@FunctionalInterface</code>只写一个接口，文中用了很多，举个例子</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> List&lt;StationQueryRespDTO&gt; <span class="title function_">listAllStation</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> distributedCache.safeGet(</span><br><span class="line">            STATION_ALL,</span><br><span class="line">            List.class,</span><br><span class="line">            () -&gt; BeanUtil.convert(stationMapper.selectList(Wrappers.emptyWrapper()), StationQueryRespDTO.class),</span><br><span class="line">            ADVANCE_TICKET_DAY,</span><br><span class="line">            TimeUnit.DAYS</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中 <code>() -&gt; BeanUtil.convert(stationMapper.selectList(Wrappers.emptyWrapper()), StationQueryRespDTO.class)</code> 是实现 <code>CacheLoader</code> 的 <code>load()</code> 接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">CacheLoader</span>&lt;T&gt; &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 加载缓存</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    T <span class="title function_">load</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>这有什么好处呢？</code></p>
+<p>我们写这样一个接口，<code>通过函数式编程方式，直接写上实现。不用再依次写具体实现，然后再调用，极大增强复用性，查这个写一个实现，查那个写一个实现</code></p>
+<p>雅，太雅了！</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/12306/">12306</a></div><div class="post-share"><div class="social-share" data-image="/img/12306/12306.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-full" href="/posts/10-17/" title="10.17"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/10-17/gw.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">10.17</div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8C%85"><span class="toc-number">1.</span> <span class="toc-text">包</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AB%99%E7%82%B9%E6%9F%A5%E8%AF%A2%E7%9B%B8%E5%85%B3"><span class="toc-number">2.</span> <span class="toc-text">站点查询相关</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B"><span class="toc-number">3.</span> <span class="toc-text">总结一下</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 By Dalowed</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>(() => {
+  const panguFn = () => {
+    if (typeof pangu === 'object') pangu.autoSpacingPage()
+    else {
+      btf.getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+        .then(() => {
+          pangu.autoSpacingPage()
+        })
+    }
+  }
+
+  const panguInit = () => {
+    if (false){
+      GLOBAL_CONFIG_SITE.isPost && panguFn()
+    } else {
+      panguFn()
+    }
+  }
+
+  btf.addGlobalFn('pjaxComplete', panguInit, 'pangu')
+  document.addEventListener('DOMContentLoaded', panguInit)
+})()</script><div class="js-pjax"></div><div class="aplayer no-destroy" data-id="12724488650" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="true" ></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script>(() => {
+  const destroyAplayer = () => {
+    if (window.aplayers) {
+      for (let i = 0; i < window.aplayers.length; i++) {
+        if (!window.aplayers[i].options.fixed) {
+          window.aplayers[i].destroy()
+        }
+      }
+    }
+  }
+
+  const runMetingJS = () => {
+    typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+  }
+
+  btf.addGlobalFn('pjaxSend', destroyAplayer, 'destroyAplayer')
+  btf.addGlobalFn('pjaxComplete', loadMeting, 'runMetingJS')
+})()</script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>(() => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => fn())
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || item.innerHTML || ""
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    if (e.request.status === 404) {
+      pjax.loadUrl('/404.html')
+    }
+  })
+})()</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><!-- hexo injector body_end start --><script data-pjax>
+  function butterfly_footer_beautify_injector_config(){
+    var parent_div_git = document.getElementById('footer-wrap');
+    var item_html = '<div id="workboard"></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" data-title="博客框架为Hexo_v7.3.0" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&amp;logo=hexo" alt=""/></a><a class="github-badge" target="_blank" href="https://butterfly.js.org/" style="margin-inline:5px" data-title="主题版本Butterfly_v5" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&amp;logo=bitdefender" alt=""/></a></p>';
+    console.log('已挂载butterfly_footer_beautify')
+    parent_div_git.insertAdjacentHTML("beforeend",item_html)
+    }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_footer_beautify_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_footer_beautify_injector_config();
+  }
+  </script><script async src="/js/footer.js"></script><!-- hexo injector body_end end --></body></html>
